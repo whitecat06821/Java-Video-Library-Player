@@ -19,6 +19,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import android.util.Log;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     // TODO: Replace with your actual libraryId and accessKey
     private static final String LIBRARY_ID = "187537";
     private static final String ACCESS_KEY = "0fac53fb-666b-4a9a-a62fc351ec9f-9458-40ff";
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,28 +54,41 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchVideos() {
         progressBar.setVisibility(View.VISIBLE);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://video.bunnycdn.com/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
         BunnyStreamApi api = retrofit.create(BunnyStreamApi.class);
-        api.getVideos(LIBRARY_ID, ACCESS_KEY).enqueue(new Callback<List<BunnyVideo>>() {
+        api.getVideos(LIBRARY_ID, ACCESS_KEY).enqueue(new Callback<BunnyVideoResponse>() {
             @Override
-            public void onResponse(Call<List<BunnyVideo>> call, Response<List<BunnyVideo>> response) {
+            public void onResponse(Call<BunnyVideoResponse> call, Response<BunnyVideoResponse> response) {
                 progressBar.setVisibility(View.GONE);
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null && response.body().getItems() != null) {
                     videoList.clear();
-                    videoList.addAll(response.body());
+                    videoList.addAll(response.body().getItems());
                     adapter.notifyDataSetChanged();
+                    if (videoList.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "No videos found.", Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "No videos found in the library.");
+                    }
                 } else {
-                    Toast.makeText(MainActivity.this, "Failed to load videos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Failed to load videos (API error)", Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "API error: " + response.code() + ", message: " + response.message());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<BunnyVideo>> call, Throwable t) {
+            public void onFailure(Call<BunnyVideoResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Network error", t);
             }
         });
     }
