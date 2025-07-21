@@ -22,6 +22,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import android.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import net.bunnystream.api.BunnyStreamApi;
+import net.bunnystream.api.models.PaginationListOfVideoModel;
+import net.bunnystream.api.models.VideoModel;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -50,23 +53,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize Bunny Stream SDK
+        BunnyStreamApi.initialize(this, "0fac53fb-666b-4a9a-a62fc351ec9f-9458-40ff", 187537);
 
         recyclerView = findViewById(R.id.recyclerView);
         progressBar = findViewById(R.id.progressBar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        // Convert BunnyVideo list to VideoItem list for the adapter
-        List<VideoItem> videoItems = convertToVideoItems(videoList);
-        adapter = new VideoListAdapter(this, videoItems, video -> {
-            Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
-            intent.putExtra("video_url", video.getVideoUrl());
-            startActivity(intent);
-        });
-        recyclerView.setAdapter(adapter);
 
-        fetchVideos();
+        // Fetch videos in a background thread
+        new Thread(() -> {
+            try {
+                PaginationListOfVideoModel response = BunnyStreamApi.INSTANCE.getVideosApi().videoList(187537);
+                List<VideoModel> videos = response.getItems();
+                runOnUiThread(() -> {
+                    VideoAdapter adapter = new VideoAdapter(this, videos, video -> {
+                        Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
+                        intent.putExtra("video_id", video.getGuid());
+                        startActivity(intent);
+                    });
+                    recyclerView.setAdapter(adapter);
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Failed to load videos", Toast.LENGTH_LONG).show());
+            }
+        }).start();
     }
 
     private void fetchVideos() {
