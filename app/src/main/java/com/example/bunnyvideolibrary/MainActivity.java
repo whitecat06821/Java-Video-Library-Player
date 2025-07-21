@@ -34,6 +34,21 @@ public class MainActivity extends AppCompatActivity {
     private static final String ACCESS_KEY = "0fac53fb-666b-4a9a-a62fc351ec9f-9458-40ff";
     private static final String TAG = "MainActivity";
 
+    private List<VideoItem> convertToVideoItems(List<BunnyVideo> bunnyVideos) {
+        List<VideoItem> videoItems = new ArrayList<>();
+        for (BunnyVideo bunny : bunnyVideos) {
+            VideoItem item = new VideoItem();
+            item.setTitle(bunny.getTitle());
+            // Construct thumbnail URL using Bunny Stream format
+            String guid = bunny.getId();
+            item.setThumbnailUrl("https://vz-b54866ea-63c.b-cdn.net/" + guid + "/thumbnails/thumbnail.jpg");
+            // HLS playlist URL
+            item.setVideoUrl("https://vz-b54866ea-63c.b-cdn.net/" + guid + "/playlist.m3u8");
+            videoItems.add(item);
+        }
+        return videoItems;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,10 +57,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         progressBar = findViewById(R.id.progressBar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new VideoListAdapter(this, videoList, video -> {
-            String hlsUrl = "https://vz-b54866ea-63c.b-cdn.net/" + video.getId() + "/playlist.m3u8";
+        // Convert BunnyVideo list to VideoItem list for the adapter
+        List<VideoItem> videoItems = convertToVideoItems(videoList);
+        adapter = new VideoListAdapter(this, videoItems, video -> {
             Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
-            intent.putExtra("VIDEO_URL", hlsUrl);
+            intent.putExtra("video_url", video.getVideoUrl());
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
