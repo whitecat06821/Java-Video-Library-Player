@@ -40,16 +40,13 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
         BunnyVideo video = videoList.get(position);
         holder.titleTextView.setText(video.getTitle());
-        String id = video.getId() != null ? video.getId() : "";
-        int videoLibraryId = video.getVideoLibraryId();
-        if (!id.isEmpty() && videoLibraryId != 0) {
-            String pullZone = "vz-" + videoLibraryId;
-            String thumbnailUrl = "https://" + pullZone + ".b-cdn.net/thumbnails/" + id + ".jpg";
+        String guid = video.getId() != null ? video.getId() : "";
+        if (!guid.isEmpty()) {
+            String thumbnailUrl = "https://vz-b54866ea-63c.b-cdn.net/" + guid + "/thumbnails/thumbnail.jpg";
             Glide.with(context).load(thumbnailUrl).placeholder(R.drawable.placeholder).into(holder.thumbnailImageView);
             holder.itemView.setOnClickListener(v -> listener.onVideoSelected(video));
             holder.itemView.setEnabled(true);
         } else {
-            // Set a placeholder image and disable click if data is invalid
             holder.thumbnailImageView.setImageResource(R.drawable.placeholder);
             holder.itemView.setOnClickListener(null);
             holder.itemView.setEnabled(false);

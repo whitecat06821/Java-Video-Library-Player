@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new VideoListAdapter(this, videoList, video -> {
+            String hlsUrl = "https://vz-b54866ea-63c.b-cdn.net/" + video.getId() + "/playlist.m3u8";
             Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
-            intent.putExtra("VIDEO_URL", video.getVideoUrl());
+            intent.putExtra("VIDEO_URL", hlsUrl);
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
