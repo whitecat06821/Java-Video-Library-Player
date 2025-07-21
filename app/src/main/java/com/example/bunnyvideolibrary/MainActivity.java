@@ -90,10 +90,19 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().getItems() != null) {
                     videoList.clear();
                     videoList.addAll(response.body().getItems());
-                    adapter.notifyDataSetChanged();
-                    if (videoList.isEmpty()) {
+                    List<VideoItem> videoItems = convertToVideoItems(videoList);
+                    if (videoItems.isEmpty()) {
                         Toast.makeText(MainActivity.this, "No videos found.", Toast.LENGTH_LONG).show();
                         Log.e(TAG, "No videos found in the library.");
+                    } else {
+                        adapter = new VideoListAdapter(MainActivity.this, videoItems, video -> {
+                            Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
+                            intent.putExtra("video_url", video.getVideoUrl());
+                            startActivity(intent);
+                        });
+                        recyclerView.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+                        Log.i(TAG, "Loaded " + videoItems.size() + " videos.");
                     }
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to load videos (API error)", Toast.LENGTH_LONG).show();
