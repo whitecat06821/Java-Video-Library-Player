@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,42 +16,42 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> {
-    public interface OnItemClickListener {
-        void onVideoSelected(BunnyVideo video);
+
+    public interface OnPlayClickListener {
+        void onPlayClick(VideoItem video);
     }
 
-    private List<BunnyVideo> videoList;
-    private OnItemClickListener listener;
+    private List<VideoItem> videoList;
     private Context context;
+    private OnPlayClickListener playClickListener;
 
-    public VideoListAdapter(Context context, List<BunnyVideo> videoList, OnItemClickListener listener) {
+    public VideoListAdapter(Context context, List<VideoItem> videoList, OnPlayClickListener playClickListener) {
         this.context = context;
         this.videoList = videoList;
-        this.listener = listener;
+        this.playClickListener = playClickListener;
     }
 
     @NonNull
     @Override
     public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_video, parent, false);
         return new VideoViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
-        BunnyVideo video = videoList.get(position);
+        VideoItem video = videoList.get(position);
         holder.titleTextView.setText(video.getTitle());
-        String guid = video.getId() != null ? video.getId() : "";
-        if (!guid.isEmpty()) {
-            String thumbnailUrl = "https://vz-b54866ea-63c.b-cdn.net/" + guid + "/thumbnails/thumbnail.jpg";
-            Glide.with(context).load(thumbnailUrl).placeholder(R.drawable.placeholder).into(holder.thumbnailImageView);
-            holder.itemView.setOnClickListener(v -> listener.onVideoSelected(video));
-            holder.itemView.setEnabled(true);
-        } else {
-            holder.thumbnailImageView.setImageResource(R.drawable.placeholder);
-            holder.itemView.setOnClickListener(null);
-            holder.itemView.setEnabled(false);
-        }
+        Glide.with(context)
+                .load(video.getThumbnailUrl())
+                .placeholder(R.drawable.placeholder)
+                .into(holder.thumbnailImageView);
+
+        holder.playButton.setOnClickListener(v -> {
+            if (playClickListener != null) {
+                playClickListener.onPlayClick(video);
+            }
+        });
     }
 
     @Override
@@ -61,11 +62,13 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     public static class VideoViewHolder extends RecyclerView.ViewHolder {
         ImageView thumbnailImageView;
         TextView titleTextView;
+        ImageButton playButton;
 
         public VideoViewHolder(@NonNull View itemView) {
             super(itemView);
             thumbnailImageView = itemView.findViewById(R.id.thumbnailImageView);
             titleTextView = itemView.findViewById(R.id.titleTextView);
+            playButton = itemView.findViewById(R.id.playButton);
         }
     }
 } 

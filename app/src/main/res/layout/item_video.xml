@@ -24,6 +24,17 @@
         app:layout_constraintStart_toEndOf="@id/thumbnailImageView"
         app:layout_constraintTop_toTopOf="@id/thumbnailImageView"
         app:layout_constraintBottom_toBottomOf="@id/thumbnailImageView"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toStartOf="@id/playButton" />
+
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_media_play"
+        android:contentDescription="Play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout> 
