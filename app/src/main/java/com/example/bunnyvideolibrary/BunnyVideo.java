@@ -5,6 +5,7 @@ public class BunnyVideo {
     private String title;
     private String thumbnail;
     private String videoUrl;
+    private int videoLibraryId;
 
     // Getters and setters
     public String getId() { return id; }
@@ -18,4 +19,7 @@ public class BunnyVideo {
 
     public String getVideoUrl() { return videoUrl; }
     public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
+
+    public int getVideoLibraryId() { return videoLibraryId; }
+    public void setVideoLibraryId(int videoLibraryId) { this.videoLibraryId = videoLibraryId; }
 } 
