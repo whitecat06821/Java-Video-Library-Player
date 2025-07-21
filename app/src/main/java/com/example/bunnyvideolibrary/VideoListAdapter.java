@@ -16,7 +16,7 @@ import java.util.List;
 
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoViewHolder> {
     public interface OnItemClickListener {
-        void onItemClick(BunnyVideo video);
+        void onVideoSelected(BunnyVideo video);
     }
 
     private List<BunnyVideo> videoList;
@@ -40,8 +40,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
         BunnyVideo video = videoList.get(position);
         holder.titleTextView.setText(video.getTitle());
-        Glide.with(context).load(video.getThumbnail()).into(holder.thumbnailImageView);
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(video));
+        // Use the correct Bunny.net thumbnail URL format
+        String pullZone = "vz-" + video.getVideoLibraryId();
+        String thumbnailUrl = "https://" + pullZone + ".b-cdn.net/thumbnails/" + video.getId() + ".jpg";
+        Glide.with(context).load(thumbnailUrl).into(holder.thumbnailImageView);
+        holder.itemView.setOnClickListener(v -> listener.onVideoSelected(video));
     }
 
     @Override
