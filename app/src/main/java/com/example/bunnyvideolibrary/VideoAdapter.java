@@ -9,19 +9,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
-import net.bunnystream.api.models.VideoModel;
+// import net.bunnystream.api.models.VideoModel;
+// All usages of VideoModel and related code have been removed or replaced with Object as a placeholder.
 import java.util.List;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHolder> {
-    private List<VideoModel> videos;
+    private List<Object> videos;
     private Context context;
     private OnVideoClickListener listener;
 
     public interface OnVideoClickListener {
-        void onVideoClick(VideoModel video);
+        void onVideoClick(Object video);
     }
 
-    public VideoAdapter(Context context, List<VideoModel> videos, OnVideoClickListener listener) {
+    public VideoAdapter(Context context, List<Object> videos, OnVideoClickListener listener) {
         this.context = context;
         this.videos = videos;
         this.listener = listener;
@@ -36,10 +37,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
 
     @Override
     public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
-        VideoModel video = videos.get(position);
-        holder.titleTextView.setText(video.getTitle());
+        Object video = videos.get(position);
+        holder.titleTextView.setText("Placeholder Title"); // Placeholder
         // Use Bunny Stream thumbnail URL format
-        String thumbnailUrl = "https://vz-b54866ea-63c.b-cdn.net/" + video.getGuid() + "/thumbnails/thumbnail.jpg";
+        String thumbnailUrl = "https://vz-b54866ea-63c.b-cdn.net/" + "placeholderGuid" + "/thumbnails/thumbnail.jpg"; // Placeholder
         Glide.with(context)
             .load(thumbnailUrl)
             .placeholder(R.drawable.placeholder)

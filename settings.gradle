@@ -12,7 +12,6 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -21,3 +20,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "BunnyVideoLibrary"
 include ':app'
+include ':bunny-stream-api'
+include ':bunny-stream-player'
+project(':bunny-stream-api').projectDir = new File(rootDir, 'bunny-stream-android/bunny-stream-api')
+project(':bunny-stream-player').projectDir = new File(rootDir, 'bunny-stream-android/bunny-stream-player')
